@@ -1,0 +1,10 @@
+[include]
+keys=text,doc,
+[exclude]
+keys=menu,nav,adv
+{format:
+        {replace:
+                [search:a]
+                [replace:[a.href]]
+                }
+        }
