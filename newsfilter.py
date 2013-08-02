@@ -9,37 +9,31 @@ class NewsProcessor:
     def __init__(self,link):
         """Initialize obj: send req, get data,req status ..."""
         self.link = link
-        try:
-            req = urllib2.Request(self.link)
-            res = urllib2.urlopen(req)
-            self.status = res.code
-            if(self.status == 200):
-                self.config = Cfg("process.cfg")
-                self.data = res.read()
-                res = re.search(r'(?is)(?:<body[^>]*>)(?P<data>.*)(?:</body>)',self.data)
-                if (res):
-                    self.data = res.groupdict()["data"]
-                inclPttrn = r"(?is)(?:<[^>]+\s+(id|class)=\S*("+self.config["filter"]["include"].replace(",","|")+")[^>]*>)"
+        #try:
+        req = urllib2.Request(self.link)
+        res = urllib2.urlopen(req)
+        self.status = res.code
+        if(self.status == 200):
+            self.config = Cfg("process.cfg")
+            self.data = res.read()
+            res = re.search(r'(?is)(?:<body[^>]*>)(?P<data>.*)(?:</body>)',self.data)
+            if (res):
+                self.data = res.groupdict()["data"]
+                inclPttrn = r"(?is)<(?P<cont>[^>]+)\s+(id|class)=\S*("+self.config["filter"]["include"].replace(",","|")+")[^>]*>"
+                #inclPttrn = r"(?is)<(?P<cont>[^>]+)\s+(id|class)=\S*("+self.config["filter"]["include"].replace(",","|")+")[^>]*>(?P<data>.*(?P<inside>(<(?P=cont)[^>]>.*(?P=inside).*</(?P=cont)>)*).*?)</(?P=cont)>"
+                #
                 res = re.search(inclPttrn,self.data)
-                #print self.data
+                cont = res.groupdict()["cont"]
                 if(res):
                     self.data=self.data[res.start():]
-                    print self.data[:50]
-                exit
             elif (self.status >= 400 and self.status < 500):
                 print "Got a client error while accessing ", self.link
             elif (self.status >= 500):
                 print "Got a server error at ", self.link
             else:
                 pass
-        except:
-            print "Got an error, please check the address provided: ", self.link
-    def applyRule(self, rule, text):
-        """Apply the given rule to the _text_ arg"""
-        pass
-    def readConfig(self):
-        """Read the config file, fix the settings"""
-
+        #except:
+        #    print "Got an error, please check the address provided: ", self.link
     def formPath(self):
         """Form the path to save the file with the filtered and formatted data in accordance with the link provided"""
         pass
@@ -53,11 +47,11 @@ class NewsProcessor:
 class Cfg(dict):
     def __init__(self,pathToFile):
         try:
-            fINI = open(pathToFile)
+            f = open(pathToFile)
         except IOError:
             print pathToFile+" не открывается, нет такого или прав нехватает"
             sys.exit()
-        lconf = fINI.readlines()
+        lconf = f.readlines()
         chars = (";", "#", "\n")
         lconf = filter((lambda x: not x[0] in chars), lconf)
         lconf = map((lambda x: x.strip()) ,lconf)
@@ -81,9 +75,8 @@ class Cfg(dict):
                 else:
                     self[base][key.strip()] = value.strip()
 
-
 if(len(sys.argv) > 1):
     np = NewsProcessor(sys.argv[1])
-
+    pass
 else:
     print "Please provide a URL"
