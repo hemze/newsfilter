@@ -28,6 +28,28 @@ class NewsProcessor:
                 cont = res.groupdict()["cont"]
                 if(res):
                     self.data=self.data[res.start():]
+                    count = 0
+                    for i in range(len(self.data)):
+                        if self.data[i]=="<":
+                            if i+4 < len(self.data):
+                                stag = self.data[i+1]+self.data[i+2]+self.data[i+3]
+                                etag = self.data[i+1]+self.data[i+2]+self.data[i+3]+self.data[i+4]
+                                if stag==cont:
+                                    count = count + 1
+                                elif etag=="/"+cont:
+                                    count = count - 1
+                            if count < 0:
+                                break
+                    self.data = self.data[:i]
+                    #re.sub(r'<a[^>]href=("|\')(?P<href>.*)[^>]>(?P<title>.*?)</a>',r"(?P=title) \[(?P=href)\]",self.data,re.I|re.S)
+                    res = re.search(r'<a[^>]href=(["\'])(?P<href>[^\1]*?)\1[^>]>(?P<title>.*?)</a>',self.data,re.I|re.S)
+                    res = re.search(r'(?is)(["\'])(?P<href>[^\1]*?)\1',self.data,re.I|re.S)
+                    f = open("temp","w")
+                    f.write(self.data)
+                    if(res):
+                        
+                        f.write(res.groupdict()["title"])
+                    
                 self.formPath()
                 self.conserveData()
             elif (self.status >= 400 and self.status < 500):
