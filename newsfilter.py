@@ -13,6 +13,8 @@ class NewsProcessor:
         req = urllib2.Request(self.link)
         res = urllib2.urlopen(req)
         self.status = res.code
+        self.path = ""
+        self.basedir = ""
         if(self.status == 200):
             self.config = Cfg("process.cfg")
             self.data = res.read()
@@ -26,6 +28,8 @@ class NewsProcessor:
                 cont = res.groupdict()["cont"]
                 if(res):
                     self.data=self.data[res.start():]
+                self.formPath()
+                self.conserveData()
             elif (self.status >= 400 and self.status < 500):
                 print "Got a client error while accessing ", self.link
             elif (self.status >= 500):
@@ -36,12 +40,23 @@ class NewsProcessor:
         #    print "Got an error, please check the address provided: ", self.link
     def formPath(self):
         """Form the path to save the file with the filtered and formatted data in accordance with the link provided"""
-        pass
+        pttrn = r"(?is)(?:http://(www|))"
+        path = re.sub(r"(?is)http[s]?://(www\.|)",r"",self.link) 
+        path = re.sub(r"(?is)(\.\w+|/|)$",r".txt",path) 
+        if(self.config["save"]["basedir"] == ""):
+            self.config["save"]["basedir"] = os.getcwd()
+        self.path = self.config["save"]["basedir"]+"/"+path
+        res = re.search(r"(?is)(?P<basedir>.*/)(?P<fname>[^/]+\.txt)$",self.path)
+        self.basedir = res.groupdict()["basedir"]
     def formatData(self):
         """Format the filtered data"""
-        pass
+        pttrn = r"(?is)"
     def conserveData(self):
         """Save the filtered and formatted data"""
+        if(not os.path.exists(self.basedir)):
+            os.makedirs(self.basedir)            
+        f = open(self.path,"w")
+        f.write(self.data)
         pass
 
 class Cfg(dict):
