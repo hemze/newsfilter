@@ -46,11 +46,12 @@ class NewsProcessor:
                 cont = res.groupdict()["cont"]
                 self.data=self.data[res.end():]
                 count = 0
+                # not so beautiful but working method to find the closing tag
                 for i in range(len(self.data)):
                     if self.data[i]=="<":
                         if i+4 < len(self.data):
-                            stag = self.data[i+1]+self.data[i+2]+self.data[i+3]
-                            etag = self.data[i+1]+self.data[i+2]+self.data[i+3]+self.data[i+4]
+                            stag = self.data[i:i+3]
+                            etag = self.data[i:i+4]
                             if stag==cont:
                                 count = count + 1
                             elif etag=="/"+cont:
@@ -66,7 +67,15 @@ class NewsProcessor:
         replace = r"\n\n"
         self.data = re.sub(search,replace,self.data)
         self.data = re.sub("\n{3,}",r"\n\n",self.data).strip()
-
+        search = r"(?is)(\b\S{80})\b"
+        res = re.findall(search,self.data)
+        if res:
+            print res
+        repl = r"\n"
+        #curr = 80
+        #while curr < len(self.data):
+        #    if (self.data[curr]==" " or self.data[curr]=="."
+        self.data = re.sub(search,replace,self.data)
     def formPath(self):
         """Form the path to save the file with the filtered and formatted data in accordance with the link provided"""
         pttrn = r"(?is)(?:http://(www|))"
