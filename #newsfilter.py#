@@ -46,6 +46,7 @@ class NewsProcessor:
                 cont = res.groupdict()["cont"]
                 self.data=self.data[res.end():]
                 count = 0
+                # not so 
                 for i in range(len(self.data)):
                     if self.data[i]=="<":
                         if i+4 < len(self.data):
