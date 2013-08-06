@@ -1,0 +1,17 @@
+KPjQuery(document).ready(function() {
+  if ( KPjQuery('#сatfish').length == 1 ) {
+    if ( KPjQuery('#сatfish #ad_ph_1').css('display') == 'block') { 
+      KPjQuery("#fixedBox").css("margin-top","27px");
+      }
+  }
+
+  KPjQuery(window).scroll(function() {
+    if ( KPjQuery('#сatfish').length == 1 ) {
+      if ( KPjQuery('#сatfish #ad_ph_1').css('display') == 'block') { 
+        var x = KPjQuery(window).scrollTop();
+        var y = 27;
+        if ( x  
+
+  
+
+    наверх [#top]
